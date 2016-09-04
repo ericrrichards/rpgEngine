@@ -1,0 +1,9 @@
+﻿{
+	"Name":  "Hello World",
+	"Width": 740,
+	"Height": 480,
+	"Manifest": "manifest.json",
+	"MainScript": "Main.csx",
+	"OnUpdate":  "Update()",
+	"Webserver": false
+}
