@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Xna.Framework;
@@ -38,17 +39,24 @@ namespace RpgEngine {
     public static class CSharpScriptEngine {
         private static Globals _globals;
         private static ScriptState<object> _scriptState;
+        private static readonly ScriptOptions Options = ScriptOptions.Default
+            .AddReferences(Assembly.GetEntryAssembly())
+            .AddImports("System", "RpgEngine");
 
         public static void SetGlobals(Globals globals) {
             _globals = globals;
         }
 
         public static object Execute(string code) {
-            _scriptState = _scriptState == null 
-                ? CSharpScript.RunAsync(code, globals:_globals, globalsType:typeof(Globals) ).Result 
-                : _scriptState.ContinueWithAsync(code).Result;
-            if (_scriptState.ReturnValue != null && !string.IsNullOrEmpty(_scriptState.ReturnValue.ToString())) {
-                return _scriptState.ReturnValue;
+            try {
+                _scriptState = _scriptState == null
+                    ? CSharpScript.RunAsync(code, globals: _globals, globalsType: typeof(Globals), options:Options).Result
+                    : _scriptState.ContinueWithAsync(code).Result;
+                if (_scriptState.ReturnValue != null && !string.IsNullOrEmpty(_scriptState.ReturnValue.ToString())) {
+                    return _scriptState.ReturnValue;
+                }
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
             }
             return null;
         }
@@ -162,5 +170,9 @@ namespace RpgEngine {
             this.texture2D = texture2D;
             tileSize = size;
         }
+    }
+
+    public class Foo {
+        
     }
 }
