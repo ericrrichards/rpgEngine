@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,6 +19,32 @@ namespace RpgEngine {
         public bool Webserver { get; set; }
     }
 
+    public class Manifest {
+        public List<string> Scripts { get; set; }
+        public List<string> Textures { get; set; }
+    }
+
+    public static class CSharpScriptEngine {
+        private static ScriptState<object> _scriptState;
+        public static object Execute(string code) {
+            _scriptState = _scriptState == null 
+                ? CSharpScript.RunAsync(code).Result 
+                : _scriptState.ContinueWithAsync(code).Result;
+            if (_scriptState.ReturnValue != null && !string.IsNullOrEmpty(_scriptState.ReturnValue.ToString())) {
+                return _scriptState.ReturnValue;
+            }
+            return null;
+        }
+
+        public static void LoadScript(string scriptFile) {
+            Execute(File.ReadAllText(scriptFile));
+        }
+
+        public static void Reset() {
+            _scriptState = null;
+        }
+    }
+
 
     /// <summary>
     /// This is the main type for your game.
@@ -23,18 +53,24 @@ namespace RpgEngine {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         private GlobalSettings _settings;
+        private Manifest _manifest;
+
 
         public Game1() {
 
             _settings = JsonConvert.DeserializeObject<GlobalSettings>(File.ReadAllText("settings.json"));
+            _manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(_settings.Manifest));
 
             graphics = new GraphicsDeviceManager(this);
 
             graphics.PreferredBackBufferHeight = _settings.Height;
             graphics.PreferredBackBufferWidth = _settings.Width;
             Window.Title = _settings.Name;
-            
+
             Content.RootDirectory = "Content";
+
+            CSharpScriptEngine.LoadScript(_settings.MainScript);
+
         }
 
         /// <summary>
@@ -77,10 +113,12 @@ namespace RpgEngine {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime) {
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) {
                 Exit();
+            }
 
             // TODO: Add your update logic here
+            CSharpScriptEngine.Execute(_settings.OnUpdate);
 
             base.Update(gameTime);
         }
