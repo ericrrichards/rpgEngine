@@ -24,11 +24,28 @@ namespace RpgEngine {
         public List<string> Textures { get; set; }
     }
 
+    public class Globals {
+        internal GameTime DeltaTime { get; set; }
+
+        public double GetDeltaTime() {
+            if (DeltaTime == null) {
+                return 0;
+            }
+            return DeltaTime.ElapsedGameTime.TotalSeconds;
+        }
+    }
+
     public static class CSharpScriptEngine {
+        private static Globals _globals;
         private static ScriptState<object> _scriptState;
+
+        public static void SetGlobals(Globals globals) {
+            _globals = globals;
+        }
+
         public static object Execute(string code) {
             _scriptState = _scriptState == null 
-                ? CSharpScript.RunAsync(code).Result 
+                ? CSharpScript.RunAsync(code, globals:_globals, globalsType:typeof(Globals) ).Result 
                 : _scriptState.ContinueWithAsync(code).Result;
             if (_scriptState.ReturnValue != null && !string.IsNullOrEmpty(_scriptState.ReturnValue.ToString())) {
                 return _scriptState.ReturnValue;
@@ -54,7 +71,7 @@ namespace RpgEngine {
         SpriteBatch spriteBatch;
         private GlobalSettings _settings;
         private Manifest _manifest;
-
+        private Globals _globals;
 
         public Game1() {
 
@@ -68,7 +85,8 @@ namespace RpgEngine {
             Window.Title = _settings.Name;
 
             Content.RootDirectory = "Content";
-
+            _globals = new Globals();
+            CSharpScriptEngine.SetGlobals(_globals);
             CSharpScriptEngine.LoadScript(_settings.MainScript);
 
         }
@@ -116,7 +134,8 @@ namespace RpgEngine {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) {
                 Exit();
             }
-
+            _globals.DeltaTime = gameTime;
+            
             // TODO: Add your update logic here
             CSharpScriptEngine.Execute(_settings.OnUpdate);
 

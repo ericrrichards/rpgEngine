@@ -1,5 +1,5 @@
 ﻿using System;
 
 void Update() {
-    Console.WriteLine("Hello World!");
+    Console.WriteLine("Hello World! " + GetDeltaTime());
 }
