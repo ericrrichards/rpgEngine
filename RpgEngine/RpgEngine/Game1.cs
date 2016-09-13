@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 namespace RpgEngine {
     using System;
+    using System.Reflection;
 
     using IronPython.Hosting;
 
@@ -66,8 +67,12 @@ namespace RpgEngine {
             Content.RootDirectory = "Content";
 
             _engine = Python.CreateEngine();
+            _engine.Runtime.LoadAssembly(Assembly.GetExecutingAssembly());
+            
+            
             _scope = _engine.CreateScope();
             
+
 
         }
 
@@ -93,6 +98,7 @@ namespace RpgEngine {
             _renderer = new Renderer(GraphicsDevice, Content);
             _globals = new Globals();
             _globals.Renderer = _renderer;
+
             _scope.SetVariable("Renderer", _globals.Renderer);
             _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
             _engine.ExecuteFile(_settings.MainScript, _scope);
@@ -120,7 +126,6 @@ namespace RpgEngine {
             }
             _globals.DeltaTime = gameTime;
             
-            //_renderer.DrawText2D(0,0, "Hello World!");
             try {
                 _onUpdate();
             } catch (Exception ex) {

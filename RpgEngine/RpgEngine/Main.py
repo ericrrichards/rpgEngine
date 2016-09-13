@@ -1,5 +1,6 @@
-﻿
+﻿import RpgEngine
 print "loaded script"
+
 
 Renderer.AlignText("center", "bottom" )
 
