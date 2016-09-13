@@ -11,9 +11,11 @@ namespace RpgEngine {
         private readonly string _text;
         private readonly SpriteFont _font;
         private readonly Color _color;
+        private Renderer _renderer;
 
-        public TextCommand(int x, int y, string text, SpriteFont font, Color color) {
-            _position = new Vector2(x, y);
+        public TextCommand(Renderer renderer, Vector2 position, string text, SpriteFont font, Color color) {
+            _renderer = renderer;
+            _position = position;
             _text = text;
             _font = font;
             _color = color;
