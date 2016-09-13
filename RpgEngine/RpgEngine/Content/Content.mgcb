@@ -25,3 +25,9 @@
 /processorParam:TextureFormat=Color
 /build:simple_panel.png
 
+#begin default.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:default.spritefont
+

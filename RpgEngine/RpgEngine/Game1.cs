@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using Microsoft.CodeAnalysis.CSharp.Scripting;
-using Microsoft.CodeAnalysis.Scripting;
+
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 
 namespace RpgEngine {
+    using System;
+
+    using IronPython.Hosting;
+
+    using Microsoft.Scripting.Hosting;
+
     public class GlobalSettings {
         public string Name { get; set; }
         public int Width { get; set; }
@@ -27,6 +29,7 @@ namespace RpgEngine {
 
     public class Globals {
         internal GameTime DeltaTime { get; set; }
+        public Renderer Renderer { get; set; }
 
         public double GetDeltaTime() {
             if (DeltaTime == null) {
@@ -36,50 +39,18 @@ namespace RpgEngine {
         }
     }
 
-    public static class CSharpScriptEngine {
-        private static Globals _globals;
-        private static ScriptState<object> _scriptState;
-        private static readonly ScriptOptions Options = ScriptOptions.Default
-            .AddReferences(Assembly.GetEntryAssembly())
-            .AddImports("System", "RpgEngine");
-
-        public static void SetGlobals(Globals globals) {
-            _globals = globals;
-        }
-
-        public static object Execute(string code) {
-            try {
-                _scriptState = _scriptState == null
-                    ? CSharpScript.RunAsync(code, globals: _globals, globalsType: typeof(Globals), options:Options).Result
-                    : _scriptState.ContinueWithAsync(code).Result;
-                if (_scriptState.ReturnValue != null && !string.IsNullOrEmpty(_scriptState.ReturnValue.ToString())) {
-                    return _scriptState.ReturnValue;
-                }
-            } catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-            }
-            return null;
-        }
-
-        public static void LoadScript(string scriptFile) {
-            Execute(File.ReadAllText(scriptFile));
-        }
-
-        public static void Reset() {
-            _scriptState = null;
-        }
-    }
-
-
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
         private GlobalSettings _settings;
         private Manifest _manifest;
         private Globals _globals;
+        private Renderer _renderer;
+        private ScriptEngine _engine;
+        private ScriptScope _scope;
+        private dynamic _onUpdate;
 
         public Game1() {
 
@@ -93,9 +64,10 @@ namespace RpgEngine {
             Window.Title = _settings.Name;
 
             Content.RootDirectory = "Content";
-            _globals = new Globals();
-            CSharpScriptEngine.SetGlobals(_globals);
-            CSharpScriptEngine.LoadScript(_settings.MainScript);
+
+            _engine = Python.CreateEngine();
+            _scope = _engine.CreateScope();
+            
 
         }
 
@@ -118,9 +90,13 @@ namespace RpgEngine {
         /// </summary>
         protected override void LoadContent() {
             // Create a new SpriteBatch, which can be used to draw textures.
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
+            _renderer = new Renderer(GraphicsDevice, Content);
+            _globals = new Globals();
+            _globals.Renderer = _renderer;
+            _scope.SetVariable("Renderer", _globals.Renderer);
+            _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
+            _engine.ExecuteFile(_settings.MainScript, _scope);
+            _onUpdate = _scope.GetVariable(_settings.OnUpdate);
 
             //var panel = new Panel(Content.Load<Texture2D>("simple_panel.png"), 3);
         }
@@ -144,8 +120,12 @@ namespace RpgEngine {
             }
             _globals.DeltaTime = gameTime;
             
-            // TODO: Add your update logic here
-            CSharpScriptEngine.Execute(_settings.OnUpdate);
+            //_renderer.DrawText2D(0,0, "Hello World!");
+            try {
+                _onUpdate();
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }
 
             base.Update(gameTime);
         }
@@ -155,24 +135,10 @@ namespace RpgEngine {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            GraphicsDevice.Clear(Color.Black);
+            
+            _renderer.Render();
 
-            // TODO: Add your drawing code here
             base.Draw(gameTime);
         }
-    }
-
-    internal class Panel {
-        private Texture2D texture2D;
-        private int tileSize;
-
-        public Panel(Texture2D texture2D, int size) {
-            this.texture2D = texture2D;
-            tileSize = size;
-        }
-    }
-
-    public class Foo {
-        
     }
 }

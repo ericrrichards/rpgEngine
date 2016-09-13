@@ -3,7 +3,7 @@
 	"Width": 740,
 	"Height": 480,
 	"Manifest": "manifest.json",
-	"MainScript": "Main.csx",
-	"OnUpdate":  "Update()",
+	"MainScript": "Main.py",
+	"OnUpdate":  "Update",
 	"Webserver": false
 }
