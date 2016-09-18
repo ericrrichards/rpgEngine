@@ -7,11 +7,14 @@ using Newtonsoft.Json;
 
 namespace RpgEngine {
     using System;
+    using System.Linq;
     using System.Reflection;
 
     using IronPython.Hosting;
+    using IronPython.Runtime.Types;
 
     using Microsoft.Scripting.Hosting;
+    using Microsoft.Xna.Framework.Graphics;
 
     public class GlobalSettings {
         public string Name { get; set; }
@@ -24,8 +27,17 @@ namespace RpgEngine {
     }
 
     public class Manifest {
-        public List<string> Scripts { get; set; }
-        public List<string> Textures { get; set; }
+        public List<Asset> Scripts { get; set; }
+        public List<Asset> Textures { get; set; }
+
+        public bool AssetExists(string name) {
+            return Scripts.Any(a => a.Name == name) || Textures.Any(a => a.Name == name);
+        }
+    }
+
+    public class Asset {
+        public string Name { get; set; }
+        public string Path { get; set; }
     }
 
     public class Globals {
@@ -52,18 +64,23 @@ namespace RpgEngine {
         private ScriptEngine _engine;
         private ScriptScope _scope;
         private dynamic _onUpdate;
+        private TextureStore _textures;
 
         public Game1() {
 
             _settings = JsonConvert.DeserializeObject<GlobalSettings>(File.ReadAllText("settings.json"));
             _manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(_settings.Manifest));
+            if (!_manifest.AssetExists(_settings.MainScript)) {
+                Console.WriteLine("Error: Main script {0}, defined in settings.json, does not exist in the asset store.", _settings.MainScript);
+                Console.WriteLine("- Has it been defined in the manifest file {0}?", _settings.Manifest);
+                Environment.Exit(-1);
+            }
 
             graphics = new GraphicsDeviceManager(this);
 
             graphics.PreferredBackBufferHeight = _settings.Height;
             graphics.PreferredBackBufferWidth = _settings.Width;
             Window.Title = _settings.Name;
-
             Content.RootDirectory = "Content";
 
             _engine = Python.CreateEngine();
@@ -98,13 +115,17 @@ namespace RpgEngine {
             _renderer = new Renderer(GraphicsDevice, Content);
             _globals = new Globals();
             _globals.Renderer = _renderer;
-
-            _scope.SetVariable("Renderer", _globals.Renderer);
-            _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
-            _engine.ExecuteFile(_settings.MainScript, _scope);
-            _onUpdate = _scope.GetVariable(_settings.OnUpdate);
-
-            //var panel = new Panel(Content.Load<Texture2D>("simple_panel.png"), 3);
+            _textures = new TextureStore(_manifest, GraphicsDevice);
+            try {
+                _scope.SetVariable("Renderer", _globals.Renderer);
+                _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
+                _scope.SetVariable("Sprite", DynamicHelpers.GetPythonTypeFromType(typeof(Sprite)));
+                _scope.SetVariable("Texture", _textures);
+                _engine.ExecuteFile(_settings.MainScript, _scope);
+                _onUpdate = _scope.GetVariable(_settings.OnUpdate);
+            } catch (Exception ex) {
+                Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);
+            }
         }
 
         /// <summary>
@@ -145,5 +166,29 @@ namespace RpgEngine {
 
             base.Draw(gameTime);
         }
+    }
+
+    public class TextureStore {
+        private Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
+        private Manifest _manifest;
+        private GraphicsDevice _device;
+
+        public TextureStore(Manifest manifest, GraphicsDevice device) {
+            _manifest = manifest;
+            _device = device;
+
+            foreach (var texture in manifest.Textures) {
+                _textures[texture.Name] = Texture2D.FromStream(_device, new FileStream(texture.Path, FileMode.Open));
+            }
+        }
+
+
+        public Texture2D Find(string name) {
+            if (_textures.ContainsKey(name)) {
+                return _textures[name];
+            }
+            Console.WriteLine("Couldn't find texture: " + name);
+            throw new FileNotFoundException();
+        } 
     }
 }

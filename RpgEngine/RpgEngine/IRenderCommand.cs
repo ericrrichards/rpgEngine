@@ -25,4 +25,20 @@ namespace RpgEngine {
             spriteBatch.DrawString(_font, _text, _position, _color);
         }
     }
+
+    public class SpriteCommand : IRenderCommand {
+        private readonly Vector2 _position;
+        private readonly Texture2D _texture;
+
+
+
+        public SpriteCommand(Texture2D texture, Vector2 position) {
+            _texture = texture;
+            _position = position;
+        }
+
+        public void Render(SpriteBatch spriteBatch) {
+            spriteBatch.Draw(_texture, _position, Color.White);
+        }
+    }
 }

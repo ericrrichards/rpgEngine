@@ -1,14 +1,17 @@
 ﻿import RpgEngine
 print "loaded script"
 
+gLeft = -Renderer.ScreenWidth / 2
+gTop = Renderer.ScreenHeight / 2
 
-Renderer.AlignText("center", "bottom" )
+gGrassTexture = Texture.Find("grass_tile.png")
+gTileHeight = gGrassTexture.Height
+gTileWidth = gGrassTexture.Width
+
+gTileSprite = Sprite.Create()
+gTileSprite.Texture = gGrassTexture
+gTileSprite.SetPosition(gLeft + gTileWidth/2, gTop - gTileHeight/2)
 
 def Update():
-	Renderer.AlignText("center", "bottom" )
-	Renderer.DrawText2D(0,0, "Hello World bottom")
-	Renderer.AlignText("center", "center" )
-	Renderer.DrawText2D(0,0, "Hello World center")
-	Renderer.AlignText("center", "top" )
-	Renderer.DrawText2D(0,0, "Hello World top")
+	Renderer.DrawSprite(gTileSprite)
 

@@ -16,6 +16,10 @@ namespace RpgEngine {
         private AlignX AlignX { get; set; }
         private AlignY AlignY { get; set; }
 
+
+        public int ScreenWidth { get { return _graphicsDevice.Viewport.Width; } }
+        public int ScreenHeight { get { return _graphicsDevice.Viewport.Height; } }
+
         public Renderer(GraphicsDevice graphicsDevice, ContentManager content) {
             _commands = new Queue<IRenderCommand>();
             _content = content;
@@ -23,6 +27,14 @@ namespace RpgEngine {
             _spriteBatch = new SpriteBatch(graphicsDevice);
             _defaultFont = _content.Load<SpriteFont>("default");
 
+        }
+
+        public void DrawSprite(Sprite sprite) {
+            var width2 = _graphicsDevice.Viewport.Width / 2;
+            var height2 = _graphicsDevice.Viewport.Height / 2;
+            var center = sprite.Texture.Bounds.Center;
+            var position = new Vector2(sprite.X + width2 - center.X, -sprite.Y + height2 - center.Y);
+            _commands.Enqueue(new SpriteCommand(sprite.Texture, position));
         }
 
         public void DrawText2D(int x, int y, string text) {
@@ -105,6 +117,8 @@ namespace RpgEngine {
             _spriteBatch.End();
         }
     }
+
+    
 
     public enum AlignX {
         Left,

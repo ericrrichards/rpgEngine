@@ -1,4 +1,14 @@
 {
-  "Scripts": [],
-  "Textures": []
+  "Scripts": [
+    {
+      "name": "Main.py",
+      "path": "Main.py"
+    }
+  ],
+  "Textures": [
+    {
+      "name": "grass_tile.png",
+      "path": "Assets/grass_tile.png"
+    }
+  ]
 }
