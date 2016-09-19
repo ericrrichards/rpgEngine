@@ -33,8 +33,12 @@ namespace RpgEngine {
             var width2 = _graphicsDevice.Viewport.Width / 2;
             var height2 = _graphicsDevice.Viewport.Height / 2;
             var center = sprite.Texture.Bounds.Center;
+            if (sprite.UVs != null) {
+                center = new Point(sprite.UVs.Value.Width/2, sprite.UVs.Value.Height/2);
+            }
             var position = new Vector2(sprite.X + width2 - center.X, -sprite.Y + height2 - center.Y);
-            _commands.Enqueue(new SpriteCommand(sprite.Texture, position));
+            
+            _commands.Enqueue(new SpriteCommand(sprite.Texture, position, sprite.UVs));
         }
 
         public void DrawText2D(int x, int y, string text) {

@@ -29,16 +29,18 @@ namespace RpgEngine {
     public class SpriteCommand : IRenderCommand {
         private readonly Vector2 _position;
         private readonly Texture2D _texture;
+        private readonly Rectangle? _uvs;
 
 
 
-        public SpriteCommand(Texture2D texture, Vector2 position) {
+        public SpriteCommand(Texture2D texture, Vector2 position, Rectangle? uvs) {
             _texture = texture;
             _position = position;
+            _uvs = uvs;
         }
 
         public void Render(SpriteBatch spriteBatch) {
-            spriteBatch.Draw(_texture, _position, Color.White);
+            spriteBatch.Draw(_texture, _position, _uvs, Color.White);
         }
     }
 }
