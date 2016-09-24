@@ -7,12 +7,20 @@
     {
       "name": "simple_map1.json",
       "path": "Assets/simple_map1.json"
+    },
+    {
+      "name": "larger_map.json",
+      "path": "Assets/larger_map.json"
     }
   ],
   "Textures": [
     {
       "name": "atlas.png",
       "path": "Assets/atlas.png"
+    },
+    {
+      "name": "cave16x16.png",
+      "path": "Assets/cave16x16.png"
     }
   ]
 }

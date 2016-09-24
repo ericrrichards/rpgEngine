@@ -14,8 +14,8 @@ namespace RpgEngine {
 
             var u0 = 0;
             var v0 = 0;
-            for (int j = 0; j < cols; j++) {
-                for (int i = 0; i < rows; i++) {
+            for (var j = 0; j < rows; j++) {
+                for (var i = 0; i < cols; i++) {
                     uvs.Add(new Rectangle(u0, v0, tileWidth,tileHeight));
                     u0 += tileWidth;
                 }

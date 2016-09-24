@@ -2,7 +2,7 @@
 import math
 print "loaded script"
 
-gTiledMap = LoadMap("simple_map1.json")
+gTiledMap = LoadMap("larger_map.json")
 
 gTextureAtlas = Texture.Find(gTiledMap.TileSets[0].Image)
 
@@ -35,6 +35,7 @@ def Update():
         for i in range(0, gMapWidth):
             tile = GetTile(gTiles, gMapWidth, i, j)
             uvs = gUVs[tile]
+
             
             gTileSprite.UVs = uvs;
             gTileSprite.SetPosition(gLeft + i * gTileWidth, gTop - j * gTileHeight)
