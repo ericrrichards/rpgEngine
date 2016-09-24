@@ -23,6 +23,7 @@ namespace RpgEngine {
         public string MainScript { get; set; }
         public string OnUpdate { get; set; }
         public bool Webserver { get; set; }
+        public bool Debug { get; set; }
     }
 
     public class Manifest {
@@ -70,8 +71,22 @@ namespace RpgEngine {
         private dynamic _onUpdate;
         private TextureStore _textures;
 
-        public Game1() {
+        private bool _loadedOnce;
+        private DateTime? _lastReload;
 
+        public Game1() {
+            graphics = new GraphicsDeviceManager(this);
+
+            LoadGlobalSettings();
+            _loadedOnce = true;
+            Content.RootDirectory = "Content";
+
+            _engine = Python.CreateEngine();
+            _engine.Runtime.LoadAssembly(Assembly.GetExecutingAssembly());
+            _engine.Runtime.LoadAssembly(typeof(Keys).Assembly);
+        }
+
+        private void LoadGlobalSettings() {
             _settings = JsonConvert.DeserializeObject<GlobalSettings>(File.ReadAllText("settings.json"));
             _manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(_settings.Manifest));
             if (!_manifest.AssetExists(_settings.MainScript)) {
@@ -79,23 +94,13 @@ namespace RpgEngine {
                 Console.WriteLine("- Has it been defined in the manifest file {0}?", _settings.Manifest);
                 Environment.Exit(-1);
             }
-
-            graphics = new GraphicsDeviceManager(this);
-
+            
             graphics.PreferredBackBufferHeight = _settings.Height;
             graphics.PreferredBackBufferWidth = _settings.Width;
+            if (_loadedOnce) {
+                graphics.ApplyChanges();
+            }
             Window.Title = _settings.Name;
-            Content.RootDirectory = "Content";
-
-            _engine = Python.CreateEngine();
-            _engine.Runtime.LoadAssembly(Assembly.GetExecutingAssembly());
-            _engine.Runtime.LoadAssembly(typeof(Keys).Assembly);
-            
-            
-            
-            
-
-
         }
 
         /// <summary>
@@ -173,6 +178,18 @@ namespace RpgEngine {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape)) {
                 Exit();
             }
+
+            if (_settings.Debug && Keyboard.GetState().IsKeyDown(Keys.F2)) {
+                if (_lastReload != null && (DateTime.Now - _lastReload.Value).TotalSeconds < 1) {
+                    return;
+                }
+                // reload resources
+                LoadGlobalSettings();
+                LoadContent();
+                _lastReload = DateTime.Now;
+            }
+
+
             _globals.DeltaTime = gameTime;
             _globals.Keyboard = Keyboard.GetState();
             

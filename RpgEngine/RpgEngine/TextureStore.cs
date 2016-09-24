@@ -15,10 +15,12 @@ namespace RpgEngine {
             _device = device;
 
             foreach (var texture in manifest.Textures) {
-                _textures[texture.Name] = Texture2D.FromStream(_device, new FileStream(texture.Path, FileMode.Open));
+                using (var fileStream = new FileStream(texture.Path, FileMode.Open)) {
+                    _textures[texture.Name] = Texture2D.FromStream(_device, fileStream);
+                }
             }
         }
-
+        
 
         public Texture2D Find(string name) {
             if (_textures.ContainsKey(name)) {

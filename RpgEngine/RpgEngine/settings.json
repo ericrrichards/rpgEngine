@@ -1,9 +1,10 @@
 ﻿{
-	"Name":  "Hello World",
-	"Width": 512,
-	"Height": 488,
-	"Manifest": "manifest.json",
-	"MainScript": "Main.py",
-	"OnUpdate":  "Update",
-	"Webserver": false
+  "Name":  "Hello World",
+  "Width": 512,
+  "Height": 488,
+  "Manifest": "manifest.json",
+  "MainScript": "Main.py",
+  "OnUpdate":  "Update",
+  "Webserver": false,
+  "Debug": true
 }
