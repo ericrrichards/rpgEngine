@@ -49,6 +49,7 @@
     <Compile Include="Renderer.cs" />
     <Compile Include="Sprite.cs" />
     <Compile Include="Texture2DExtensions.cs" />
+    <Compile Include="TextureStore.cs" />
     <Compile Include="TileMap.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +149,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Main_textureAtlas.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Map.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="settings.json">

@@ -14,7 +14,6 @@ namespace RpgEngine {
     using IronPython.Runtime.Types;
 
     using Microsoft.Scripting.Hosting;
-    using Microsoft.Xna.Framework.Graphics;
 
     public class GlobalSettings {
         public string Name { get; set; }
@@ -128,11 +127,20 @@ namespace RpgEngine {
                     }
                     throw new FileNotFoundException(s);
                 }));
+                _scope.SetVariable("LoadScript", new Action<string>(scriptFile => {
+                    if (_manifest.AssetExists(scriptFile)) {
+                        _engine.ExecuteFile(_manifest.Scripts.First(a => a.Name == scriptFile).Path, _scope);
+                        Console.WriteLine("Loaded script {0}", scriptFile);
+                    } else {
+                        throw new FileNotFoundException(scriptFile);
+                    }
+                }));
 
                 _engine.ExecuteFile(_settings.MainScript, _scope);
                 _onUpdate = _scope.GetVariable(_settings.OnUpdate);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);
+                Console.WriteLine(_engine.GetService<ExceptionOperations>().FormatException(ex));
             }
         }
 
@@ -174,29 +182,5 @@ namespace RpgEngine {
 
             base.Draw(gameTime);
         }
-    }
-
-    public class TextureStore {
-        private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
-        private Manifest _manifest;
-        private GraphicsDevice _device;
-
-        public TextureStore(Manifest manifest, GraphicsDevice device) {
-            _manifest = manifest;
-            _device = device;
-
-            foreach (var texture in manifest.Textures) {
-                _textures[texture.Name] = Texture2D.FromStream(_device, new FileStream(texture.Path, FileMode.Open));
-            }
-        }
-
-
-        public Texture2D Find(string name) {
-            if (_textures.ContainsKey(name)) {
-                return _textures[name];
-            }
-            Console.WriteLine("Couldn't find texture: " + name);
-            throw new FileNotFoundException();
-        } 
     }
 }

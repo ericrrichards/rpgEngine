@@ -5,6 +5,10 @@
       "path": "Main.py"
     },
     {
+      "name": "Map.py",
+      "path": "Map.py"
+    },
+    {
       "name": "simple_map1.json",
       "path": "Assets/simple_map1.json"
     },
