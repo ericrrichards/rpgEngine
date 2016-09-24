@@ -111,6 +111,7 @@ namespace RpgEngine {
         /// all of your content.
         /// </summary>
         protected override void LoadContent() {
+
             // Create a new SpriteBatch, which can be used to draw textures.
             _renderer = new Renderer(GraphicsDevice, Content);
             _globals = new Globals();
@@ -121,6 +122,13 @@ namespace RpgEngine {
                 _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
                 _scope.SetVariable("Sprite", DynamicHelpers.GetPythonTypeFromType(typeof(Sprite)));
                 _scope.SetVariable("Texture", _textures);
+                _scope.SetVariable("LoadMap", new Func<string, TileMap>(s => {
+                    if (_manifest.AssetExists(s)) {
+                        return JsonConvert.DeserializeObject<TileMap>(File.ReadAllText(_manifest.Scripts.First(a => a.Name == s).Path));
+                    }
+                    throw new FileNotFoundException(s);
+                }));
+
                 _engine.ExecuteFile(_settings.MainScript, _scope);
                 _onUpdate = _scope.GetVariable(_settings.OnUpdate);
             } catch (Exception ex) {
@@ -169,7 +177,7 @@ namespace RpgEngine {
     }
 
     public class TextureStore {
-        private Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
+        private readonly Dictionary<string, Texture2D> _textures = new Dictionary<string, Texture2D>();
         private Manifest _manifest;
         private GraphicsDevice _device;
 

@@ -3,57 +3,13 @@
     {
       "name": "Main.py",
       "path": "Main.py"
+    },
+    {
+      "name": "simple_map1.json",
+      "path": "Assets/simple_map1.json"
     }
   ],
   "Textures": [
-    {
-      "name": "grass_tile.png",
-      "path": "Assets/grass_tile.png"
-    },
-    {
-      "name": "tiles_00.png",
-      "path": "Assets/tiles_00.png"
-    },
-    {
-      "name": "tiles_01.png",
-      "path": "Assets/tiles_01.png"
-    },
-    {
-      "name": "tiles_02.png",
-      "path": "Assets/tiles_02.png"
-    },
-    {
-      "name": "tiles_03.png",
-      "path": "Assets/tiles_03.png"
-    },
-    {
-      "name": "tiles_04.png",
-      "path": "Assets/tiles_04.png"
-    },
-    {
-      "name": "tiles_05.png",
-      "path": "Assets/tiles_05.png"
-    },
-    {
-      "name": "tiles_06.png",
-      "path": "Assets/tiles_06.png"
-    },
-    {
-      "name": "tiles_07.png",
-      "path": "Assets/tiles_07.png"
-    },
-    {
-      "name": "tiles_08.png",
-      "path": "Assets/tiles_08.png"
-    },
-    {
-      "name": "tiles_09.png",
-      "path": "Assets/tiles_09.png"
-    },
-    {
-      "name": "tiles_10.png",
-      "path": "Assets/tiles_10.png"
-    },
     {
       "name": "atlas.png",
       "path": "Assets/atlas.png"
