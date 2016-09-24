@@ -46,12 +46,19 @@
     def GetTile(self, x, y):
         return self.Tiles[x + y * self.Width] - 1
 
+    def Goto(self, x, y):
+        self.CamX = x - Renderer.ScreenWidth / 2
+        self.CamY = -y + Renderer.ScreenHeight / 2
+
+    def GotoTile(self, x, y):
+        self.Goto(x * self.TileWidth + self.TileWidth/2, y * self.TileHeight + self.TileHeight/2)
+
     def Render(self, renderer):
         tileLeft, tileBottom = self.PointToTile(self.CamX - renderer.ScreenWidth / 2, self.CamY - renderer.ScreenHeight / 2)
-        tileRight, tileTop = self.PointToTile(self.CamX + renderer.ScreenWidth /2, self.CamY + renderer.ScreenWidth / 2)
+        tileRight, tileTop = self.PointToTile(self.CamX + renderer.ScreenWidth / 2, self.CamY + renderer.ScreenWidth / 2)
 
-        for j in range(tileTop, tileBottom):
-            for i in range(tileLeft, tileRight):
+        for j in range(tileTop, tileBottom + 1):
+            for i in range(tileLeft, tileRight + 1):
                 tile = self.GetTile(i,j)
                 uvs = self.UVs[tile]
 

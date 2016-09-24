@@ -1,7 +1,7 @@
 ﻿{
 	"Name":  "Hello World",
-	"Width": 256,
-	"Height": 224,
+	"Width": 512,
+	"Height": 488,
 	"Manifest": "manifest.json",
 	"MainScript": "Main.py",
 	"OnUpdate":  "Update",

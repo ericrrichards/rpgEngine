@@ -42,12 +42,17 @@ namespace RpgEngine {
     public class Globals {
         internal GameTime DeltaTime { get; set; }
         public Renderer Renderer { get; set; }
+        public KeyboardState Keyboard { get; set; }
 
         public double GetDeltaTime() {
             if (DeltaTime == null) {
                 return 0;
             }
             return DeltaTime.ElapsedGameTime.TotalSeconds;
+        }
+
+        public bool IsKeyDown(Keys key) {
+            return Keyboard != null && Keyboard.IsKeyDown(key);
         }
     }
 
@@ -84,9 +89,10 @@ namespace RpgEngine {
 
             _engine = Python.CreateEngine();
             _engine.Runtime.LoadAssembly(Assembly.GetExecutingAssembly());
+            _engine.Runtime.LoadAssembly(typeof(Keys).Assembly);
             
             
-            _scope = _engine.CreateScope();
+            
             
 
 
@@ -117,6 +123,11 @@ namespace RpgEngine {
             _globals.Renderer = _renderer;
             _textures = new TextureStore(_manifest, GraphicsDevice);
             try {
+                _scope = _engine.CreateScope();
+                
+                _engine.Execute("from Microsoft.Xna.Framework.Input import Keys", _scope);
+                _engine.Execute("import RpgEngine", _scope);
+
                 _scope.SetVariable("Renderer", _globals.Renderer);
                 _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
                 _scope.SetVariable("Sprite", DynamicHelpers.GetPythonTypeFromType(typeof(Sprite)));
@@ -127,6 +138,7 @@ namespace RpgEngine {
                     }
                     throw new FileNotFoundException(s);
                 }));
+                _scope.SetVariable("IsKeyDown", new Func<Keys, bool>(keys => _globals.IsKeyDown(keys)));
                 _scope.SetVariable("LoadScript", new Action<string>(scriptFile => {
                     if (_manifest.AssetExists(scriptFile)) {
                         _engine.ExecuteFile(_manifest.Scripts.First(a => a.Name == scriptFile).Path, _scope);
@@ -162,6 +174,7 @@ namespace RpgEngine {
                 Exit();
             }
             _globals.DeltaTime = gameTime;
+            _globals.Keyboard = Keyboard.GetState();
             
             try {
                 _onUpdate();

@@ -15,7 +15,7 @@ namespace RpgEngine {
 
         private AlignX AlignX { get; set; }
         private AlignY AlignY { get; set; }
-
+        private Vector2 CameraPosition { get; set; }
 
         public int ScreenWidth { get { return _graphicsDevice.Viewport.Width; } }
         public int ScreenHeight { get { return _graphicsDevice.Viewport.Height; } }
@@ -29,6 +29,10 @@ namespace RpgEngine {
 
         }
 
+        public void Translate(int x, int y) {
+            CameraPosition = new Vector2(x,y);
+        }
+
         public void DrawSprite(Sprite sprite) {
             var width2 = _graphicsDevice.Viewport.Width / 2;
             var height2 = _graphicsDevice.Viewport.Height / 2;
@@ -37,6 +41,7 @@ namespace RpgEngine {
                 center = new Point(sprite.UVs.Value.Width/2, sprite.UVs.Value.Height/2);
             }
             var position = new Vector2(sprite.X + width2 - center.X, -sprite.Y + height2 - center.Y);
+            position += CameraPosition;
             
             _commands.Enqueue(new SpriteCommand(sprite.Texture, position, sprite.UVs));
         }
@@ -73,6 +78,7 @@ namespace RpgEngine {
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            position += CameraPosition;
 
             _commands.Enqueue(new TextCommand(this, position, text, _defaultFont, Color.White));
         }
