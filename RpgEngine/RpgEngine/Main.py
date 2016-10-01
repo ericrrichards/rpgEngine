@@ -1,11 +1,11 @@
 ﻿import math
 print "loaded script"
 
-LoadScript("Map.py")
+#LoadScript("Map.py")
 
 
 
-gTiledMap = LoadMap("larger_map.json")
+gTiledMap = TileMap.LoadMap("larger_map.json")
 
 gMap = Map(gTiledMap)
 

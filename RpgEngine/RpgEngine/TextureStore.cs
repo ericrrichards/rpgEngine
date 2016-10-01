@@ -10,6 +10,9 @@ namespace RpgEngine {
         private Manifest _manifest;
         private GraphicsDevice _device;
 
+        internal static TextureStore Instance { get; private set; }
+
+
         public TextureStore(Manifest manifest, GraphicsDevice device) {
             _manifest = manifest;
             _device = device;
@@ -19,6 +22,7 @@ namespace RpgEngine {
                     _textures[texture.Name] = Texture2D.FromStream(_device, fileStream);
                 }
             }
+            Instance = this;
         }
         
 

@@ -6,7 +6,7 @@
         self.CamY = 0
 
         self.MapDef = mapDef
-        self.TextureAtlas = Texture.Find(gTiledMap.TileSets[0].Image)
+        self.TextureAtlas = Texture.Find(mapDef.TileSets[0].Image)
 
         self.TileSprite = Sprite.Create()
         self.TileSprite.Texture = self.TextureAtlas
@@ -55,7 +55,7 @@
 
     def Render(self, renderer):
         tileLeft, tileBottom = self.PointToTile(self.CamX - renderer.ScreenWidth / 2, self.CamY - renderer.ScreenHeight / 2)
-        tileRight, tileTop = self.PointToTile(self.CamX + renderer.ScreenWidth / 2, self.CamY + renderer.ScreenWidth / 2)
+        tileRight, tileTop = self.PointToTile(self.CamX + renderer.ScreenWidth / 2, self.CamY + renderer.ScreenHeight / 2)
 
         for j in range(tileTop, tileBottom + 1):
             for i in range(tileLeft, tileRight + 1):

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -14,31 +13,6 @@ namespace RpgEngine {
     using IronPython.Runtime.Types;
 
     using Microsoft.Scripting.Hosting;
-
-    public class GlobalSettings {
-        public string Name { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public string Manifest { get; set; }
-        public string MainScript { get; set; }
-        public string OnUpdate { get; set; }
-        public bool Webserver { get; set; }
-        public bool Debug { get; set; }
-    }
-
-    public class Manifest {
-        public List<Asset> Scripts { get; set; }
-        public List<Asset> Textures { get; set; }
-
-        public bool AssetExists(string name) {
-            return Scripts.Any(a => a.Name == name) || Textures.Any(a => a.Name == name);
-        }
-    }
-
-    public class Asset {
-        public string Name { get; set; }
-        public string Path { get; set; }
-    }
 
     public class Globals {
         internal GameTime DeltaTime { get; set; }
@@ -57,16 +31,18 @@ namespace RpgEngine {
         }
     }
 
+
+
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game {
-        GraphicsDeviceManager graphics;
+        readonly GraphicsDeviceManager graphics;
         private GlobalSettings _settings;
         private Manifest _manifest;
         private Globals _globals;
         private Renderer _renderer;
-        private ScriptEngine _engine;
+        private readonly ScriptEngine _engine;
         private ScriptScope _scope;
         private dynamic _onUpdate;
         private TextureStore _textures;
@@ -106,7 +82,6 @@ namespace RpgEngine {
         /// <summary>
         /// Allows the game to perform any initialization it needs to before starting to run.
         /// This is where it can query for any required services and load any non-graphic
-        /// This is where it can query for any required services and load any non-graphic
         /// related content.  Calling base.Initialize will enumerate through any components
         /// and initialize them as well.
         /// </summary>
@@ -124,25 +99,23 @@ namespace RpgEngine {
 
             // Create a new SpriteBatch, which can be used to draw textures.
             _renderer = new Renderer(GraphicsDevice, Content);
-            _globals = new Globals();
-            _globals.Renderer = _renderer;
+            _globals = new Globals {
+                Renderer = _renderer
+            };
             _textures = new TextureStore(_manifest, GraphicsDevice);
             try {
                 _scope = _engine.CreateScope();
                 
                 _engine.Execute("from Microsoft.Xna.Framework.Input import Keys", _scope);
                 _engine.Execute("import RpgEngine", _scope);
+                _engine.Execute("from RpgEngine import TileMap", _scope);
+                _engine.Execute("from RpgEngine import Sprite", _scope);
+                _engine.Execute("from RpgEngine import Map", _scope);
+
 
                 _scope.SetVariable("Renderer", _globals.Renderer);
                 _scope.SetVariable("GetDeltaTime", new Func<double>(_globals.GetDeltaTime));
-                _scope.SetVariable("Sprite", DynamicHelpers.GetPythonTypeFromType(typeof(Sprite)));
                 _scope.SetVariable("Texture", _textures);
-                _scope.SetVariable("LoadMap", new Func<string, TileMap>(s => {
-                    if (_manifest.AssetExists(s)) {
-                        return JsonConvert.DeserializeObject<TileMap>(File.ReadAllText(_manifest.Scripts.First(a => a.Name == s).Path));
-                    }
-                    throw new FileNotFoundException(s);
-                }));
                 _scope.SetVariable("IsKeyDown", new Func<Keys, bool>(keys => _globals.IsKeyDown(keys)));
                 _scope.SetVariable("LoadScript", new Action<string>(scriptFile => {
                     if (_manifest.AssetExists(scriptFile)) {
