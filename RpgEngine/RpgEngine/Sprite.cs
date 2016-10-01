@@ -10,6 +10,7 @@ namespace RpgEngine {
         public Texture2D Texture { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public Point Position { get { return new Point(X, Y);} }
         public Rectangle? UVs { get; set; }
 
 

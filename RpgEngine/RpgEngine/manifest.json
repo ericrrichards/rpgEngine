@@ -13,6 +13,14 @@
       "path": "Scripts/Entity.py"
     },
     {
+      "name": "StateMachine.py",
+      "path": "Scripts/StateMachine.py"
+    },
+    {
+      "name": "WaitState.py",
+      "path": "Scripts/WaitState.py"
+    },
+    {
       "name": "simple_map1.json",
       "path": "Assets/simple_map1.json"
     },
