@@ -84,6 +84,10 @@ namespace RpgEngine {
             Goto(x * TileWidth + TileWidth/2, y * TileHeight + TileHeight/2);
         }
 
+        public Point GetTileFoot(int x, int y) {
+            return new Point(X + (x * TileWidth), Y - (y*TileHeight) - TileHeight / 2);
+        }
+
         public void Render(Renderer renderer) {
             var leftBottom = PointToTile(CamX - renderer.ScreenWidth / 2, 
                                          CamY - renderer.ScreenHeight / 2);

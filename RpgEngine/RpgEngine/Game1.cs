@@ -170,6 +170,7 @@ namespace RpgEngine {
                 _onUpdate();
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message);
+                Console.WriteLine(_engine.GetService<ExceptionOperations>().FormatException(ex));
             }
 
             base.Update(gameTime);

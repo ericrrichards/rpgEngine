@@ -33,6 +33,10 @@
     {
       "name": "rpg_indoor.png",
       "path": "Assets/rpg_indoor.png"
+    },
+    {
+      "name": "walk_cycle.png",
+      "path": "Assets/walk_cycle.png"
     }
   ]
 }
