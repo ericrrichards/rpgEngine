@@ -30,7 +30,7 @@ namespace RpgEngine {
         }
 
         public void Translate(int x, int y) {
-            CameraPosition = new Vector2(x,y);
+            CameraPosition = new Vector2(x,-y);
         }
 
         public void DrawSprite(Sprite sprite) {

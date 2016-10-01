@@ -58,9 +58,12 @@ namespace RpgEngine {
         private Point PointToTile(int x, int y) {
             x += TileWidth / 2;
             y -= TileHeight / 2;
-            
-            x = Math.Min(X + WidthPixel - 1, Math.Max(X, x));
-            y = Math.Max(Y - HeightPixel + 1, Math.Min(Y, y));
+
+
+            x = Math.Max(X, x);
+            y = Math.Min(Y, y);
+            x = Math.Min(X + WidthPixel - 1, x);
+            y = Math.Max(Y - HeightPixel + 1, y);
 
             var tileX = (int)Math.Floor((double)(x - X) / TileWidth);
             var tileY = (int)Math.Floor((double)(Y - y) / TileHeight);
@@ -82,11 +85,12 @@ namespace RpgEngine {
         }
 
         public void Render(Renderer renderer) {
-            var leftBottom = PointToTile(CamX - renderer.ScreenWidth / 2, CamY - renderer.ScreenHeight / 2);
-            var rightTop = PointToTile(CamX + renderer.ScreenWidth / 2, CamY + renderer.ScreenHeight / 2);
-
-            for (int j = rightTop.Y; j <= leftBottom.Y; j++) {
-                for (int i = leftBottom.X; i <= rightTop.X; i++) {
+            var leftBottom = PointToTile(CamX - renderer.ScreenWidth / 2, 
+                                         CamY - renderer.ScreenHeight / 2);
+            var rightTop = PointToTile(CamX + renderer.ScreenWidth / 2, 
+                                       CamY + renderer.ScreenHeight / 2);
+            for (var j = rightTop.Y; j <= leftBottom.Y; j++) {
+                for (var i = leftBottom.X; i <= rightTop.X; i++) {
                     var tile = GetTile(i, j);
                     var uvs = UVs[tile];
 

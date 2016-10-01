@@ -15,6 +15,10 @@
     {
       "name": "larger_map.json",
       "path": "Assets/larger_map.json"
+    },
+    {
+      "name": "small_room.json",
+      "path": "Assets/small_room.json"
     }
   ],
   "Textures": [
@@ -25,6 +29,10 @@
     {
       "name": "cave16x16.png",
       "path": "Assets/cave16x16.png"
+    },
+    {
+      "name": "rpg_indoor.png",
+      "path": "Assets/rpg_indoor.png"
     }
   ]
 }
