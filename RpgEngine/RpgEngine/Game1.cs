@@ -8,6 +8,7 @@ namespace RpgEngine {
     using System;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.InteropServices;
 
     using IronPython.Hosting;
     using IronPython.Runtime.Types;
@@ -119,14 +120,14 @@ namespace RpgEngine {
                 _scope.SetVariable("IsKeyDown", new Func<Keys, bool>(keys => _globals.IsKeyDown(keys)));
                 _scope.SetVariable("LoadScript", new Action<string>(scriptFile => {
                     if (_manifest.AssetExists(scriptFile)) {
-                        _engine.ExecuteFile(_manifest.Scripts.First(a => a.Name == scriptFile).Path, _scope);
+                        _engine.ExecuteFile(_manifest.GetScript(scriptFile).Path, _scope);
                         Console.WriteLine("Loaded script {0}", scriptFile);
                     } else {
                         throw new FileNotFoundException(scriptFile);
                     }
                 }));
 
-                _engine.ExecuteFile(_settings.MainScript, _scope);
+                _engine.ExecuteFile(_manifest.GetScript(_settings.MainScript).Path, _scope);
                 _onUpdate = _scope.GetVariable(_settings.OnUpdate);
             } catch (Exception ex) {
                 Console.WriteLine(ex.Message + Environment.NewLine + ex.StackTrace);

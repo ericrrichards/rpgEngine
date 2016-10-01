@@ -2,11 +2,15 @@
   "Scripts": [
     {
       "name": "Main.py",
-      "path": "Main.py"
+      "path": "Scripts/Main.py"
     },
     {
       "name": "Map.py",
-      "path": "Map.py"
+      "path": "Scripts/Map.py"
+    },
+    {
+      "name": "Entity.py",
+      "path": "Scripts/Entity.py"
     },
     {
       "name": "simple_map1.json",

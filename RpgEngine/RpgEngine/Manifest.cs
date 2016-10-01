@@ -16,6 +16,10 @@ namespace RpgEngine {
         public bool AssetExists(string name) {
             return Scripts.Any(a => a.Name == name) || Textures.Any(a => a.Name == name);
         }
+
+        public Asset GetScript(string scriptName) {
+            return Scripts.First(a => a.Name == scriptName);
+        }
     }
 
     public class Asset {
