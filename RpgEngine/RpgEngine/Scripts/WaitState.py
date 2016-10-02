@@ -85,7 +85,11 @@ class MoveState:
     def Exit(self):
         self.Entity.TileX += self.MoveX
         self.Entity.TileY += self.MoveY
-        Teleport(self.Entity, self.Map)
+        TeleportEntity(self.Entity, self.Map)
+
+        trigger = self.Map.GetTrigger(self.Entity.Layer, self.Entity.TileX, self.Entity.TileY)
+        if trigger:
+            trigger.OnEnter(trigger, self.Entity)
 
     def Render(self, renderer):
         pass

@@ -21,6 +21,18 @@
       "path": "Scripts/WaitState.py"
     },
     {
+      "name": "Util.py",
+      "path": "Scripts/Util.py"
+    },
+    {
+      "name": "Actions.py",
+      "path": "Scripts/Actions.py"
+    },
+    {
+      "name": "Trigger.py",
+      "path": "Scripts/Trigger.py"
+    },
+    {
       "name": "simple_map1.json",
       "path": "Assets/simple_map1.json"
     },

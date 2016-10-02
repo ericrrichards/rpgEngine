@@ -30,6 +30,20 @@ namespace RpgEngine {
         public Sprite TileSprite { get; set; }
         public List<Rectangle> UVs { get; set; }
 
+        private Dictionary<Point, object> Triggers = new Dictionary<Point, object>();
+
+        public void AddTrigger(int x, int y, object trigger) {
+            Triggers.Add(new Point(x,y),trigger );
+        }
+
+        public object GetTrigger(int layer, int x, int y) {
+            var point = new Point(x,y);
+            if (Triggers.ContainsKey(point)) {
+                return Triggers[point];
+            }
+            return null;
+        }
+
         public int LayerCount {
             get {
                 Debug.Assert(MapDef.Layers.Count % 3 == 0);
@@ -90,7 +104,11 @@ namespace RpgEngine {
         private int GetTile(int x, int y, int layer = 0) {
             var tiles = MapDef.Layers[layer].Data;
 
-            return tiles[x + y * Width] - 1;
+            return tiles[CoordToIndex(x, y)] - 1;
+        }
+
+        private int CoordToIndex(int x, int y) {
+            return x + y * Width;
         }
 
         private void Goto(int x, int y) {

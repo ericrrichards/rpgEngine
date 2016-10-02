@@ -8,12 +8,18 @@ print "loaded script"
 LoadScript("Entity.py")
 LoadScript("StateMachine.py")
 LoadScript("WaitState.py")
+LoadScript("Util.py")
+LoadScript("Actions.py")
+LoadScript("Trigger.py")
 
 gTiledMap = TileMap.LoadMap("small_room.json")
 
 gMap = Map(gTiledMap)
 
 gMap.GotoTile(5,5)
+
+
+
 
 class Character:
     def __init__(self, entity):
@@ -38,14 +44,15 @@ heroDef = EntityDef("walk_cycle.png", 16, 24, 8, 11,3, 0)
 
 gHero = Character(Entity(heroDef))
 
+gUpDoorTeleport = Actions.Teleport(gMap, 11, 3)
+gDownDoorTeleport = Actions.Teleport(gMap, 10, 11)
+gDownDoorTeleport(None, gHero.Entity)
 
-def Teleport(entity, map):
-    pos = map.GetTileFoot(entity.TileX, entity.TileY)
-    entity.Sprite.SetPosition(pos.X, pos.Y + entity.Height / 2)
+gTriggerTop = Trigger(gDownDoorTeleport, None, None)
+gTriggerBottom = Trigger(gUpDoorTeleport, None, None)
 
-
-Teleport(gHero.Entity, gMap)
-
+gMap.AddTrigger(10, 12, gTriggerBottom)
+gMap.AddTrigger(11, 2, gTriggerTop)
 
 def Update():
     dt = GetDeltaTime()
@@ -67,5 +74,6 @@ def Update():
 
     gHero.Controller.Update(dt)
 
-
+    if IsKeyDown(Keys.Space):
+        gUpDoorTeleport(None, gHero.Entity)
 
