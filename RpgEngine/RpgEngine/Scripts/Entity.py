@@ -1,11 +1,12 @@
 ﻿class EntityDef:
-    def __init__(self, texture, width, height, startFrame, tileX, tileY):
+    def __init__(self, texture, width, height, startFrame, tileX, tileY, layer):
         self.Texture = texture
         self.Width = width
         self.Height = height
         self.StartFrame = startFrame
         self.TileX = tileX
         self.TileY = tileY
+        self.Layer = layer
 
 class Entity:
     def __init__(self, entityDef):
@@ -20,6 +21,7 @@ class Entity:
         self.Sprite.Texture = self.Texture
         self.UVs = self.Texture.GenerateUVs(self.Width, self.Height)
         self.SetFrame(self.StartFrame)
+        self.Layer = entityDef.Layer
 
     def SetFrame(self, frame):
         self.Sprite.UVs = self.UVs[frame]

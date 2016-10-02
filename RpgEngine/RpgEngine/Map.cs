@@ -30,6 +30,13 @@ namespace RpgEngine {
         public Sprite TileSprite { get; set; }
         public List<Rectangle> UVs { get; set; }
 
+        public int LayerCount {
+            get {
+                Debug.Assert(MapDef.Layers.Count % 3 == 0);
+                return MapDef.Layers.Count / 3;
+            }
+        }
+
         public Map(TileMap mapDef) {
             CamX = 0;
             CamY = 0;
@@ -58,7 +65,7 @@ namespace RpgEngine {
 
             foreach (var tileSet in mapDef.TileSets) {
                 if (tileSet.Name == "collision_graphic") {
-                    _blockingTile = tileSet.FirstGid-1;
+                    _blockingTile = tileSet.FirstGid - 1;
                 }
             }
             Debug.Assert(_blockingTile != 0);
@@ -92,35 +99,47 @@ namespace RpgEngine {
         }
 
         public void GotoTile(int x, int y) {
-            Goto(x * TileWidth + TileWidth/2, y * TileHeight + TileHeight/2);
+            Goto(x * TileWidth + TileWidth / 2, y * TileHeight + TileHeight / 2);
         }
 
         public Point GetTileFoot(int x, int y) {
-            return new Point(X + (x * TileWidth), Y - (y*TileHeight) - TileHeight / 2);
+            return new Point(X + (x * TileWidth), Y - (y * TileHeight) - TileHeight / 2);
         }
 
         public bool IsBlocked(int layer, int tileX, int tileY) {
+            if (tileX < 0 || tileY < 0 || tileX >= Width || tileY >= Height) {
+                Console.WriteLine("Off-map {0},{1}", tileX, tileY);
+                return true;
+            }
             var tile = GetTile(tileX, tileY, layer + 2);
             return tile == _blockingTile;
         }
 
         public void Render(Renderer renderer) {
-            var leftBottom = PointToTile(CamX - renderer.ScreenWidth / 2, 
+            RenderLayer(renderer, 0);
+        }
+
+        public void RenderLayer(Renderer renderer, int layer) {
+
+            var layerIndex = (layer * 3);
+
+            var leftBottom = PointToTile(CamX - renderer.ScreenWidth / 2,
                                          CamY - renderer.ScreenHeight / 2);
-            var rightTop = PointToTile(CamX + renderer.ScreenWidth / 2, 
+            var rightTop = PointToTile(CamX + renderer.ScreenWidth / 2,
                                        CamY + renderer.ScreenHeight / 2);
             for (var j = rightTop.Y; j <= leftBottom.Y; j++) {
                 for (var i = leftBottom.X; i <= rightTop.X; i++) {
-                    var tile = GetTile(i, j);
-                    var uvs = UVs[tile];
-
-                    TileSprite.UVs = uvs;
                     TileSprite.SetPosition(X + i * TileWidth, Y - j * TileHeight);
-                    renderer.DrawSprite(TileSprite);
+                    var tile = GetTile(i, j, layerIndex);
+                    if (tile >= 0) {
+                        var uvs = UVs[tile];
 
-                    tile = GetTile(i, j, 1);
-                    if (tile > 0) {
-                        uvs = UVs[tile];
+                        TileSprite.UVs = uvs;
+                        renderer.DrawSprite(TileSprite);
+                    }
+                    tile = GetTile(i, j, layerIndex + 1);
+                    if (tile >= 0) {
+                        var uvs = UVs[tile];
                         TileSprite.UVs = uvs;
                         renderer.DrawSprite(TileSprite);
                     }

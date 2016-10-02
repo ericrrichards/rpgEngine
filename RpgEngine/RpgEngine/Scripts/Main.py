@@ -33,7 +33,7 @@ class Character:
 
 
 
-heroDef = EntityDef("walk_cycle.png", 16, 24, 8, 10, 2)
+heroDef = EntityDef("walk_cycle.png", 16, 24, 8, 11,3, 0)
 
 
 gHero = Character(Entity(heroDef))
@@ -50,9 +50,20 @@ Teleport(gHero.Entity, gMap)
 def Update():
     dt = GetDeltaTime()
 
+    playerPos = gHero.Entity.Sprite.Position
+
+    gMap.CamX = int(math.floor(playerPos.X))
+    gMap.CamY = int(math.floor(playerPos.Y))
+
     Renderer.Translate(-gMap.CamX, -gMap.CamY)
-    gMap.Render(Renderer)
-    Renderer.DrawSprite(gHero.Entity.Sprite)
+
+    layerCount = gMap.LayerCount
+
+    for i in range(0, layerCount):
+        gMap.RenderLayer(Renderer, i)
+        if i == gHero.Entity.Layer:
+            Renderer.DrawSprite(gHero.Entity.Sprite)
+    
 
     gHero.Controller.Update(dt)
 
