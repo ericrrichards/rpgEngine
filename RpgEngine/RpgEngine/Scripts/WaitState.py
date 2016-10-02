@@ -50,7 +50,12 @@ class MoveState:
         self.Anim = Animation(List[int]([self.Entity.StartFrame]))
 
     def Enter(self, params):
-        self.MoveX, self.MoveY = params
+        moveX, moveY = params
+
+        
+
+        self.MoveX = moveX
+        self.MoveY = moveY
         frames = None
         if self.MoveX == -1:
             frames = self.Character.AnimLeft
@@ -68,6 +73,14 @@ class MoveState:
         self.PixelX = pixelPos.X
         self.PixelY = pixelPos.Y
         self.Tween = Tween(0, self.TileWidth, self.MoveSpeed)
+
+        targetX = self.Entity.TileX + moveX
+        targetY = self.Entity.TileY + moveY
+        if self.Map.IsBlocked(0, targetX, targetY):
+            self.MoveX = 0
+            self.MoveY = 0
+            self.Entity.SetFrame(self.Anim.Frame)
+            self.Controller.Change("wait", None)
 
     def Exit(self):
         self.Entity.TileX += self.MoveX

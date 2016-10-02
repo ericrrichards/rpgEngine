@@ -32,6 +32,8 @@ namespace RpgEngine {
     }
 
     public class TileSet {
+        public string Name { get; set; }
+        public int FirstGid { get; set; }
         public int TileWidth { get; set; }
         public int TileHeight { get; set; }
         public string Image { get; set; }

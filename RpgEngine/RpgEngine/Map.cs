@@ -1,11 +1,13 @@
 namespace RpgEngine {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     using Microsoft.Xna.Framework;
     using Microsoft.Xna.Framework.Graphics;
 
     public class Map {
+        private int _blockingTile;
         public int CamX { get; set; }
         public int CamY { get; set; }
 
@@ -53,6 +55,13 @@ namespace RpgEngine {
             HeightPixel = Height * TileHeight;
 
             UVs = TextureAtlas.GenerateUVs(TileWidth, TileHeight);
+
+            foreach (var tileSet in mapDef.TileSets) {
+                if (tileSet.Name == "collision_graphic") {
+                    _blockingTile = tileSet.FirstGid-1;
+                }
+            }
+            Debug.Assert(_blockingTile != 0);
         }
 
         private Point PointToTile(int x, int y) {
@@ -71,8 +80,10 @@ namespace RpgEngine {
             return new Point(tileX, tileY);
         }
 
-        private int GetTile(int x, int y) {
-            return Tiles[x + y * Width] - 1;
+        private int GetTile(int x, int y, int layer = 0) {
+            var tiles = MapDef.Layers[layer].Data;
+
+            return tiles[x + y * Width] - 1;
         }
 
         private void Goto(int x, int y) {
@@ -86,6 +97,11 @@ namespace RpgEngine {
 
         public Point GetTileFoot(int x, int y) {
             return new Point(X + (x * TileWidth), Y - (y*TileHeight) - TileHeight / 2);
+        }
+
+        public bool IsBlocked(int layer, int tileX, int tileY) {
+            var tile = GetTile(tileX, tileY, layer + 1);
+            return tile == _blockingTile;
         }
 
         public void Render(Renderer renderer) {
