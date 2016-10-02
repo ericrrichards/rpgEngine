@@ -17,8 +17,12 @@ gMap.GotoTile(5,5)
 
 class Character:
     def __init__(self, entity):
+        self.AnimUp = List[int]([0,1,2,3])
+        self.AnimRight = List[int]([4,5,6,7])
+        self.AnimDown = List[int]([8,9,10,11])
+        self.AnimLeft = List[int]([12,13,14,15])
         self.Entity = entity
-        self.Controller =  StateMachine({
+        self.Controller = StateMachine({
             "wait": lambda: self.WaitState,
             "move": lambda: self.MoveState
         })
@@ -37,7 +41,7 @@ gHero = Character(Entity(heroDef))
 
 def Teleport(entity, map):
     pos = map.GetTileFoot(entity.TileX, entity.TileY)
-    entity.Sprite.SetPosition(pos.X, pos.Y + entity.Height/2)
+    entity.Sprite.SetPosition(pos.X, pos.Y + entity.Height / 2)
 
 
 Teleport(gHero.Entity, gMap)
@@ -46,7 +50,7 @@ Teleport(gHero.Entity, gMap)
 def Update():
     dt = GetDeltaTime()
 
-    Renderer.Translate( -gMap.CamX, -gMap.CamY)
+    Renderer.Translate(-gMap.CamX, -gMap.CamY)
     gMap.Render(Renderer)
     Renderer.DrawSprite(gHero.Entity.Sprite)
 

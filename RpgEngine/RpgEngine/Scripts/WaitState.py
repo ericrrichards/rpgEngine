@@ -4,9 +4,13 @@
         self.Map = map
         self.Entity = character.Entity
         self.Controller = character.Controller
+        self.FrameResetSpeed = 0.05
+        self.FrameCount = 0
+
 
     def Enter(self, params):
-        self.Entity.SetFrame(self.Entity.StartFrame)
+        self.FrameCount = 0
+        
 
     def Render(self, renderer):
         pass
@@ -15,6 +19,12 @@
         pass
 
     def Update(self, dt):
+        if self.FrameCount != -1:
+            self.FrameCount += dt
+            if self.FrameCount >= self.FrameResetSpeed:
+                self.FrameCount = -1
+                self.Entity.SetFrame(self.Entity.StartFrame)
+
         if IsKeyDown(Keys.Left):
             self.Controller.Change("move", (-1,0))
         elif IsKeyDown(Keys.Right):
@@ -37,8 +47,23 @@ class MoveState:
         self.Tween = Tween(0,0,1)
         self.MoveSpeed = 0.3
 
+        self.Anim = Animation(List[int]([self.Entity.StartFrame]))
+
     def Enter(self, params):
         self.MoveX, self.MoveY = params
+        frames = None
+        if self.MoveX == -1:
+            frames = self.Character.AnimLeft
+        elif self.MoveX == 1:
+            frames = self.Character.AnimRight
+        elif self.MoveY == -1:
+            frames = self.Character.AnimUp
+        elif self.MoveY == 1:
+            frames = self.Character.AnimDown
+
+        self.Anim.Frames = frames
+
+
         pixelPos = self.Entity.Sprite.Position
         self.PixelX = pixelPos.X
         self.PixelY = pixelPos.Y
@@ -53,6 +78,9 @@ class MoveState:
         pass
 
     def Update(self, dt):
+        self.Anim.Update(dt)
+        self.Entity.SetFrame(self.Anim.Frame)
+
         self.Tween.Update(dt)
 
         value = self.Tween.Value

@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 
 namespace RpgEngine {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
@@ -71,7 +72,7 @@ namespace RpgEngine {
                 Console.WriteLine("- Has it been defined in the manifest file {0}?", _settings.Manifest);
                 Environment.Exit(-1);
             }
-            
+
             graphics.PreferredBackBufferHeight = _settings.Height;
             graphics.PreferredBackBufferWidth = _settings.Width;
             if (_loadedOnce) {
@@ -106,13 +107,15 @@ namespace RpgEngine {
             _textures = new TextureStore(_manifest, GraphicsDevice);
             try {
                 _scope = _engine.CreateScope();
-                
+
                 _engine.Execute("from Microsoft.Xna.Framework.Input import Keys", _scope);
                 _engine.Execute("import RpgEngine", _scope);
                 _engine.Execute("from RpgEngine import TileMap", _scope);
                 _engine.Execute("from RpgEngine import Sprite", _scope);
                 _engine.Execute("from RpgEngine import Map", _scope);
                 _engine.Execute("from RpgEngine import Tween", _scope);
+                _engine.Execute("from RpgEngine import Animation", _scope);
+                _engine.Execute("from System.Collections.Generic import *", _scope);
 
 
                 _scope.SetVariable("Renderer", _globals.Renderer);
@@ -167,7 +170,7 @@ namespace RpgEngine {
 
             _globals.DeltaTime = gameTime;
             _globals.Keyboard = Keyboard.GetState();
-            
+
             try {
                 _onUpdate();
             } catch (Exception ex) {
@@ -183,50 +186,50 @@ namespace RpgEngine {
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime) {
-            
+
             _renderer.Render();
 
             base.Draw(gameTime);
         }
     }
 
-    public class Tween {
-        public delegate float TweenFunc(float timePassed, float start, float distance, float duration);
-        private readonly TweenFunc _tweenFunc;
-        private readonly float _distance;
-        private readonly float _start;
-        public float Value { get; private set; }
-        private readonly float _totalDuration;
-        private float _timePassed;
-        public bool IsFinished { get; private set; }
+    public class Animation {
+        private List<int> _frames;
+        private int _index;
+        private float _spf;
+        private float _time;
+        private bool _loop;
 
-        public Tween(float start, float finish, float totalDuration, TweenFunc tweenFunc = null ) {
-            if (tweenFunc == null) {
-                _tweenFunc = Linear;
-            } else {
-                _tweenFunc = tweenFunc;
+        public Animation(List<int> frames, bool loop = true, float spf = 0.12f) {
+            _frames = frames ?? new List<int> { 0 };
+            _index = 0;
+            _spf = spf;
+            _time = 0;
+            _loop = loop;
+        }
+
+        public void Update(float dt) {
+            _time += dt;
+
+            if (!(_time >= _spf)) {
+                return;
             }
-            _distance = finish - start;
-            _start = start;
-            Value = start;
-            _totalDuration = totalDuration;
-            _timePassed = 0;
-            IsFinished = false;
+            _index++;
+            _time = 0;
 
-        }
-
-        public void Update(float elapsedTime) {
-            _timePassed += elapsedTime;
-            Value = _tweenFunc(_timePassed, _start, _distance, _totalDuration);
-            if (_timePassed > _totalDuration) {
-                Value = _start + _distance;
-                IsFinished = true;
+            if (_index < _frames.Count) {
+                return;
             }
-
+            _index = _loop ? 0 : _frames.Count - 1;
         }
 
-        private static float Linear(float timepassed, float start, float distance, float duration) {
-            return distance * timepassed / duration + start;
+        public List<int> Frames {
+            set {
+                _frames = value;
+                _index = Math.Min(_index, _frames.Count - 1);
+            }
         }
+        public int Frame { get { return _frames[_index]; }}
+        public bool IsFinished { get { return !_loop && _index != _frames.Count - 1; } }
     }
 }
