@@ -100,7 +100,7 @@ namespace RpgEngine {
         }
 
         public bool IsBlocked(int layer, int tileX, int tileY) {
-            var tile = GetTile(tileX, tileY, layer + 1);
+            var tile = GetTile(tileX, tileY, layer + 2);
             return tile == _blockingTile;
         }
 
@@ -117,6 +117,13 @@ namespace RpgEngine {
                     TileSprite.UVs = uvs;
                     TileSprite.SetPosition(X + i * TileWidth, Y - j * TileHeight);
                     renderer.DrawSprite(TileSprite);
+
+                    tile = GetTile(i, j, 1);
+                    if (tile > 0) {
+                        uvs = UVs[tile];
+                        TileSprite.UVs = uvs;
+                        renderer.DrawSprite(TileSprite);
+                    }
                 }
             }
         }
